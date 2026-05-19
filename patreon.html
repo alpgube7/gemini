@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Yönetim Paneli | 42 AI Studio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-100 min-h-screen font-sans">
+
+    <div id="adminLock" class="fixed inset-0 bg-slate-950 z-[200] flex items-center justify-center p-4">
+        <div class="bg-white p-8 rounded-3xl w-full max-w-sm shadow-2xl text-center">
+            <h2 class="text-xl font-black mb-6 text-slate-800">42 AI STUDIO DEKODER PANEL</h2>
+            <input type="password" id="adminPass" class="w-full p-4 border border-slate-200 rounded-xl mb-4 text-center text-xl outline-none focus:border-indigo-500" placeholder="Yönetici Şifresi">
+            <button onclick="checkAdmin()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3.5 rounded-xl font-bold transition">GİRİŞ YAP VE VERİLERİ ÇÖZ</button>
+        </div>
+    </div>
+
+    <div id="adminContent" class="hidden flex flex-col min-h-screen">
+        <nav class="bg-white border-b p-4 flex justify-between items-center shadow-sm sticky top-0 z-50">
+            <div class="flex items-center gap-4">
+                <a href="index.html" class="flex items-center gap-1 text-xs font-bold text-gray-500 hover:text-indigo-600 transition bg-slate-100 px-3 py-2 rounded-lg">
+                    ⬅ Ana Sayfaya Dön
+                </a>
+                <h1 class="font-black text-indigo-600 text-lg">42 AI Studio Güvenli Kontrol Paneli</h1>
+            </div>
+            <div class="flex gap-2">
+                <button onclick="fetchData()" class="bg-slate-100 hover:bg-slate-200 px-4 py-2 rounded-lg text-xs font-bold">Verileri Yenile</button>
+                <button onclick="saveChangesToGitHub()" class="bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded-lg text-xs font-bold shadow transition">Değişiklikleri Yeniden Kriptola & Kaydet</button>
+            </div>
+        </nav>
+
+        <div class="bg-white border-b px-6 flex gap-4 text-sm font-bold text-gray-500">
+            <button onclick="switchTab('users')" id="tab-users" class="py-4 border-b-2 border-indigo-600 text-indigo-600">Müşteri Kayıt Bilgileri</button>
+            <button onclick="switchTab('notifs')" id="tab-notifs" class="py-4 border-b-2 border-transparent">Şifre Yardım Talepleri</button>
+            <button onclick="switchTab('acts')" id="tab-acts" class="py-4 border-b-2 border-transparent">İstem ve Üretim Geçmişleri</button>
+            <button onclick="switchTab('prompts')" id="tab-prompts" class="py-4 border-b-2 border-transparent">Hazır Şablon Yönetimi</button>
+        </div>
+
+        <main class="p-6 max-w-7xl w-full mx-auto flex-1">
+            
+            <div id="sec-users" class="tab-panel bg-white rounded-xl shadow-sm border overflow-hidden">
+                <table class="w-full text-left border-collapse">
+                    <thead class="bg-slate-50 border-b text-xs font-bold text-gray-400 uppercase">
+                        <tr>
+                            <th class="p-4 w-12"><input type="checkbox" onclick="toggleAll('user-row', this)"></th>
+                            <th class="p-4">Kayıt Tarihi / Metot</th>
+                            <th class="p-4">Kullanıcı E-Postası</th>
+                            <th class="p-4">Çözülmüş Hesap Şifresi</th>
+                            <th class="p-4 text-right">Aksiyon</th>
+                        </tr>
+                    </thead>
+                    <tbody id="userTable" class="text-sm divide-y"></tbody>
+                </table>
+                <div class="p-4 bg-slate-50"><button onclick="bulkDelete('user-row')" class="text-xs bg-red-50 text-red-600 border border-red-200 px-3 py-1.5 rounded font-bold hover:bg-red-100">Seçilenleri Sistemden Tamamen Temizle</button></div>
+            </div>
+
+            <div id="sec-notifs" class="tab-panel hidden bg-white rounded-xl shadow-sm border overflow-hidden">
+                <table class="w-full text-left border-collapse">
+                    <thead class="bg-slate-50 border-b text-xs font-bold text-gray-400 uppercase">
+                        <tr>
+                            <th class="p-4 w-12"><input type="checkbox" onclick="toggleAll('notif-row', this)"></th>
+                            <th class="p-4">Talep Tarihi</th>
+                            <th class="p-4">Yardım İsteyen Kullanıcı</th>
+                            <th class="p-4 text-right">Durum</th>
+                        </tr>
+                    </thead>
+                    <tbody id="notifTable" class="text-sm divide-y"></tbody>
+                </table>
+                <div class="p-4 bg-slate-50"><button onclick="bulkDelete('notif-row')" class="text-xs bg-red-50 text-red-600 border border-red-200 px-3 py-1.5 rounded font-bold hover:bg-red-100">Seçilen Bildirimleri Sil</button></div>
+            </div>
+
+            <div id="sec-acts" class="tab-panel hidden bg-white rounded-xl shadow-sm border overflow-hidden">
+                <table class="w-full text-left border-collapse">
+                    <thead class="bg-slate-50 border-b text-xs font-bold text-gray-400 uppercase">
+                        <tr>
+                            <th class="p-4 w-12"><input type="checkbox" onclick="toggleAll('act-row', this)"></th>
+                            <th class="p-4">Kullanıcı</th>
+                            <th class="p-4">Gönderilen İstem (Prompt)</th>
+                            <th class="p-4 text-right">İşlem</th>
+                        </tr>
+                    </thead>
+                    <tbody id="actTable" class="text-sm divide-y"></tbody>
+                </table>
+                <div class="p-4 bg-slate-50"><button onclick="bulkDelete('act-row')" class="text-xs bg-red-50 text-red-600 border border-red-200 px-3 py-1.5 rounded font-bold hover:bg-red-100">Aktivite Geçmişini Temizle</button></div>
+            </div>
+
+            <div id="sec-prompts" class="tab-panel hidden grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div class="bg-white p-6 rounded-xl shadow-sm border h-fit">
+                    <h3 class="font-bold text-sm mb-4 text-gray-700">Yeni Şablon Ekle</h3>
+                    <textarea id="newPromptTxt" rows="4" class="w-full border p-3 rounded-lg text-sm mb-4 outline-none" placeholder="Hazır prompt metni..."></textarea>
+                    <button onclick="addReadyPrompt()" class="w-full bg-indigo-600 text-white py-2 rounded-lg text-xs font-bold">Listeye Ekle</button>
+                </div>
+                <div class="lg:col-span-2 bg-white rounded-xl shadow-sm border overflow-hidden">
+                    <table class="w-full text-left border-collapse">
+                        <thead class="bg-slate-50 border-b text-xs font-bold text-gray-400 uppercase">
+                            <tr>
+                                <th class="p-4">Aktif Hazır Promptlar (Şifrelenmez)</th>
+                                <th class="p-4 text-right w-32">İşlemler</th>
+                            </tr>
+                        </thead>
+                        <tbody id="promptTable" class="text-sm divide-y"></tbody>
+                    </table>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <script>
+        let decryptedLines = [];
+        let adminTokenPassword = '';
+
+        function checkAdmin() {
+            const pass = document.getElementById('adminPass').value;
+            if(pass === 'Ag1453ag!') {
+                adminTokenPassword = pass;
+                document.getElementById('adminLock').classList.add('hidden');
+                document.getElementById('adminContent').classList.remove('hidden');
+                fetchData();
+            } else { alert("Hatalı Parola!"); }
+        }
+
+        function switchTab(target) {
+            document.querySelectorAll('.tab-panel').forEach(p => p.classList.add('hidden'));
+            document.getElementById('sec-' + target).classList.remove('hidden');
+            document.querySelectorAll('[id^="tab-"]').forEach(t => t.className = "py-4 border-b-2 border-transparent text-gray-500");
+            document.getElementById('tab-' + target).className = "py-4 border-b-2 border-indigo-600 text-indigo-600 font-bold";
+        }
+
+        function toggleAll(className, master) {
+            document.querySelectorAll('.' + className).forEach(box => box.checked = master.checked);
+        }
+
+        function fetchData() {
+            const formData = new FormData();
+            formData.append('action', 'read_db');
+            formData.append('admin_pass', adminTokenPassword);
+
+            fetch('save.php', { method: 'POST', body: formData })
+            .then(r => r.json())
+            .then(res => {
+                if(res.status === 'success') {
+                    decryptedLines = res.data;
+                    renderDashboard();
+                } else { alert("Veri çözme hatası."); }
+            });
+        }
+
+        function renderDashboard() {
+            const uTable = document.getElementById('userTable'); uTable.innerHTML = '';
+            const nTable = document.getElementById('notifTable'); nTable.innerHTML = '';
+            const aTable = document.getElementById('actTable'); aTable.innerHTML = '';
+            const pTable = document.getElementById('promptTable'); pTable.innerHTML = '';
+
+            decryptedLines.forEach((line, index) => {
+                if(!line) return;
+                
+                if(line.startsWith('[USER]')) {
+                    const match = line.match(/\[USER\] \[(.*?)\] DATE: (.*?) \| MAIL: (.*?) \| PASS: (.*)/);
+                    if(match) {
+                        uTable.innerHTML += `<tr>
+                            <td class="p-4"><input type="checkbox" class="user-row" data-index="${index}"></td>
+                            <td class="p-4 text-xs">${match[2]} <b class="text-indigo-500">${match[1]}</b></td>
+                            <td class="p-4 font-bold">${match[3]}</td>
+                            <td class="p-4"><input type="text" value="${match[4]}" class="border p-1 rounded text-xs w-40" onchange="updateUserInline(${index}, '${match[1]}', '${match[2]}', '${match[3]}', this.value)"></td>
+                            <td class="p-4 text-right"><button onclick="deleteSingleLine(${index})" class="text-xs text-red-500 font-bold hover:underline">Sil</button></td>
+                        </tr>`;
+                    }
+                }
+                else if(line.startsWith('[NOTIFICATION]')) {
+                    const match = line.match(/\[NOTIFICATION\] DATE: (.*?) \| MAIL: (.*)/);
+                    if(match) {
+                        nTable.innerHTML += `<tr>
+                            <td class="p-4"><input type="checkbox" class="notif-row" data-index="${index}"></td>
+                            <td class="p-4 text-xs">${match[1]}</td>
+                            <td class="p-4 text-red-600 font-bold">${match[2]} (Şifre Yardımı İstiyor)</td>
+                            <td class="p-4 text-right"><button onclick="deleteSingleLine(${index})" class="text-xs text-slate-500 hover:underline">Kapat</button></td>
+                        </tr>`;
+                    }
+                }
+                else if(line.startsWith('[ACTIVITY]')) {
+                    const match = line.match(/\[ACTIVITY\] DATE: (.*?) \| USER: (.*?) \| PROMPT: (.*)/);
+                    if(match) {
+                        aTable.innerHTML += `<tr>
+                            <td class="p-4"><input type="checkbox" class="act-row" data-index="${index}"></td>
+                            <td class="p-4 font-bold text-xs">${match[2]}</td>
+                            <td class="p-4 text-xs max-w-xs truncate">${match[3]}</td>
+                            <td class="p-4 text-right"><button onclick="deleteSingleLine(${index})" class="text-xs text-red-500 hover:underline">Kaldır</button></td>
+                        </tr>`;
+                    }
+                }
+                else if(line.startsWith('[READY_PROMPT]')) {
+                    const text = line.replace('[READY_PROMPT] text=', '');
+                    pTable.innerHTML += `<tr>
+                        <td class="p-4"><input type="text" value="${text}" class="w-full border p-2 rounded text-xs" onchange="updatePromptInline(${index}, this.value)"></td>
+                        <td class="p-4 text-right"><button onclick="deleteSingleLine(${index})" class="text-xs text-red-500 hover:underline">Sil</button></td>
+                    </tr>`;
+                }
+            });
+        }
+
+        function updateUserInline(idx, plat, date, mail, newPass) { decryptedLines[idx] = `[USER] [${plat}] DATE: ${date} | MAIL: ${mail} | PASS: ${newPass}`; }
+        function updatePromptInline(idx, newText) { decryptedLines[idx] = `[READY_PROMPT] text=${newText}`; }
+        function addReadyPrompt() {
+            const txt = document.getElementById('newPromptTxt').value.trim();
+            if(!txt) return alert("Boş bırakılamaz.");
+            decryptedLines.push(`[READY_PROMPT] text=${txt}`);
+            document.getElementById('newPromptTxt').value = '';
+            renderDashboard();
+        }
+        function deleteSingleLine(idx) { decryptedLines.splice(idx, 1); renderDashboard(); }
+        function bulkDelete(className) {
+            let selectedIndexes = [];
+            document.querySelectorAll('.' + className + ':checked').forEach(box => {
+                selectedIndexes.push(parseInt(box.getAttribute('data-index')));
+            });
+            if(selectedIndexes.length === 0) return alert("Seçim yapılmadı.");
+            selectedIndexes.sort((a, b) => b - a);
+            selectedIndexes.forEach(idx => decryptedLines.splice(idx, 1));
+            renderDashboard();
+        }
+
+        // --- GITHUB ÜZERİNE GÜNCEL VERİLERİ BASMA ---
+        function saveChangesToGitHub() {
+            const formData = new FormData();
+            formData.append('action', 'overwrite');
+            formData.append('admin_pass', adminTokenPassword);
+            formData.append('content', JSON.stringify(decryptedLines));
+
+            fetch('save.php', { method: 'POST', body: formData })
+            .then(r => r.json())
+            .then(res => {
+                if(res.status === 'success') { alert("Değişiklikler yeniden şifrelendi ve GitHub'a güvenle basıldı!"); fetchData(); }
+                else { alert("Hata oluştu."); }
+            });
+        }
+    </script>
+</body>
+</html>
