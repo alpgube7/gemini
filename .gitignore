@@ -1,0 +1,13 @@
+# Güvenlik: API Keys ve Şifreler
+config.php
+.env
+.env.local
+*.key
+
+# Veri dosyaları
+veriler.txt
+
+# Sistem dosyaları
+.DS_Store
+Thumbs.db
+*.log
