@@ -1,8 +1,37 @@
+# Güvenlik: API Keys ve Şifreler
 config.php
 .env
 .env.local
+.env.*.local
 *.key
+
+# Veri dosyaları
 veriler.txt
+
+# Sistem dosyaları
 .DS_Store
 Thumbs.db
 *.log
+
+# IDE ve Editor dosyaları
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.project
+.classpath
+
+# Node.js (eğer kullanırsan)
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Composer (PHP)
+vendor/
+composer.lock
+
+# Geçici dosyalar
+*.tmp
+*.temp
+.cache/
